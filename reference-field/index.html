@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Black Page</title>
+    <title>Reference Image Collection Field</title>
     <style>
         body {
             background-color: black;
@@ -13,6 +13,22 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            position: relative;
+        }
+        .grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-columns: repeat(20, 1fr);
+            grid-template-rows: repeat(20, 1fr);
+            gap: 1px;
+            background-color: grey;
+        }
+        .grid div {
+            background-color: rgba(255, 255, 255, 0.1);
         }
         img {
             position: absolute;
@@ -22,11 +38,16 @@
             max-height: 100%;
             transition: transform 0.2s ease;
         }
+        img.selected {
+            border: 3px solid yellow;
+        }
     </style>
 </head>
 <body>
+    <div class="grid"></div>
     <script>
         let scale = 1;
+        let selectedImage = null;
 
         document.body.onwheel = (e) => {
             if (e.deltaY < 0) {
@@ -35,7 +56,7 @@
                 scale /= 1.1;
             }
             document.body.style.transform = `scale(${scale})`;
-        }
+        };
 
         document.body.ondblclick = (e) => {
             if (e.target.tagName.toLowerCase() === 'img') {
@@ -67,6 +88,8 @@
             const img = e.target;
             if (img.tagName.toLowerCase() !== 'img') return;
 
+            selectedImage = img;
+            img.classList.add('selected');
             let offsetX = e.clientX - img.getBoundingClientRect().left;
             let offsetY = e.clientY - img.getBoundingClientRect().top;
 
@@ -82,6 +105,21 @@
 
             document.addEventListener('mousemove', moveHandler);
             document.addEventListener('mouseup', stopHandler);
+        });
+
+        document.body.addEventListener('keydown', (e) => {
+            if (e.key === 'Delete' && selectedImage) {
+                selectedImage.remove();
+                selectedImage = null;
+            }
+        });
+
+        document.body.addEventListener('click', (e) => {
+            if (e.target.tagName.toLowerCase() === 'img' && selectedImage !== e.target) {
+                if (selectedImage) selectedImage.classList.remove('selected');
+                selectedImage = e.target;
+                selectedImage.classList.add('selected');
+            }
         });
     </script>
 </body>
