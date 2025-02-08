@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reference Field</title>
+    <title>Reference Page</title>
     <style>
         body {
             background-color: black;
@@ -48,16 +48,27 @@
         .ui-box button:hover {
             color: red;
         }
+        .ui-box button:focus {
+            outline: none;
+        }
     </style>
 </head>
 <body>
     <div class="ui-box">
-        <button id="deleteBtn">🗑️</button>
+        <button id="minusBtn">−</button>
+        <button id="plusBtn">+</button>
+        <button id="deleteBtn">🗑</button>
     </div>
 
     <script>
         let selectedImage = null;
         let offsetX, offsetY, dragStartX, dragStartY;
+        let scale = 1;
+
+        const zoom = (factor) => {
+            scale *= factor;
+            document.body.style.transform = `scale(${scale})`;
+        };
 
         document.body.addEventListener('mousedown', (e) => {
             if (e.target.tagName.toLowerCase() !== 'img') return;
@@ -113,6 +124,22 @@
                     reader.readAsDataURL(blob);
                 }
             }
+        });
+
+        document.body.addEventListener('wheel', (e) => {
+            if (e.deltaY < 0) {
+                zoom(1.1);
+            } else {
+                zoom(0.9);
+            }
+        });
+
+        document.getElementById('plusBtn').addEventListener('click', () => {
+            zoom(1.1);
+        });
+
+        document.getElementById('minusBtn').addEventListener('click', () => {
+            zoom(0.9);
         });
 
         document.getElementById('deleteBtn').addEventListener('click', () => {
