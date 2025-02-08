@@ -3,16 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reference Image Collection Field</title>
+    <title>Reference Field</title>
     <style>
         body {
             background-color: black;
             margin: 0;
             overflow: hidden;
             height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             position: relative;
         }
         .grid {
@@ -25,7 +22,7 @@
             grid-template-columns: repeat(20, 1fr);
             grid-template-rows: repeat(20, 1fr);
             gap: 1px;
-            background-color: grey;
+            background-color: rgba(169, 169, 169, 0.3);
         }
         .grid div {
             background-color: rgba(255, 255, 255, 0.1);
@@ -46,23 +43,40 @@
 <body>
     <div class="grid"></div>
     <script>
-        let scale = 1;
         let selectedImage = null;
 
-        document.body.onwheel = (e) => {
-            if (e.deltaY < 0) {
-                scale *= 1.1;
-            } else {
-                scale /= 1.1;
-            }
-            document.body.style.transform = `scale(${scale})`;
-        };
+        document.body.addEventListener('mousedown', (e) => {
+            if (e.target.tagName.toLowerCase() !== 'img') return;
 
-        document.body.ondblclick = (e) => {
-            if (e.target.tagName.toLowerCase() === 'img') {
-                e.target.remove();
+            if (selectedImage) {
+                selectedImage.classList.remove('selected');
             }
-        };
+            selectedImage = e.target;
+            selectedImage.classList.add('selected');
+            let offsetX = e.clientX - selectedImage.getBoundingClientRect().left;
+            let offsetY = e.clientY - selectedImage.getBoundingClientRect().top;
+
+            const moveHandler = (e) => {
+                selectedImage.style.left = `${e.clientX - offsetX}px`;
+                selectedImage.style.top = `${e.clientY - offsetY}px`;
+            };
+
+            const stopHandler = () => {
+                document.removeEventListener('mousemove', moveHandler);
+                document.removeEventListener('mouseup', stopHandler);
+            };
+
+            document.addEventListener('mousemove', moveHandler);
+            document.addEventListener('mouseup', stopHandler);
+        });
+
+        document.body.addEventListener('click', (e) => {
+            if (e.target.tagName.toLowerCase() === 'img' && selectedImage !== e.target) {
+                if (selectedImage) selectedImage.classList.remove('selected');
+                selectedImage = e.target;
+                selectedImage.classList.add('selected');
+            }
+        });
 
         document.body.addEventListener('paste', (e) => {
             const items = e.clipboardData.items;
@@ -84,41 +98,10 @@
             }
         });
 
-        document.body.addEventListener('mousedown', (e) => {
-            const img = e.target;
-            if (img.tagName.toLowerCase() !== 'img') return;
-
-            selectedImage = img;
-            img.classList.add('selected');
-            let offsetX = e.clientX - img.getBoundingClientRect().left;
-            let offsetY = e.clientY - img.getBoundingClientRect().top;
-
-            const moveHandler = (e) => {
-                img.style.left = `${e.clientX - offsetX}px`;
-                img.style.top = `${e.clientY - offsetY}px`;
-            };
-
-            const stopHandler = () => {
-                document.removeEventListener('mousemove', moveHandler);
-                document.removeEventListener('mouseup', stopHandler);
-            };
-
-            document.addEventListener('mousemove', moveHandler);
-            document.addEventListener('mouseup', stopHandler);
-        });
-
         document.body.addEventListener('keydown', (e) => {
             if (e.key === 'Delete' && selectedImage) {
                 selectedImage.remove();
                 selectedImage = null;
-            }
-        });
-
-        document.body.addEventListener('click', (e) => {
-            if (e.target.tagName.toLowerCase() === 'img' && selectedImage !== e.target) {
-                if (selectedImage) selectedImage.classList.remove('selected');
-                selectedImage = e.target;
-                selectedImage.classList.add('selected');
             }
         });
     </script>
