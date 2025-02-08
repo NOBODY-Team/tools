@@ -60,7 +60,7 @@
 </head>
 <body>
     <div class="content-wrapper">
-        <!--PASTED IMAGES GO HERE-->
+        <!-- PASTED IMAGES GO HERE -->
     </div>
     <div class="ui-box">
         <button id="minusBtn">−</button>
@@ -95,8 +95,8 @@
             dragStartY = e.clientY;
 
             const moveHandler = (e) => {
-                selectedImage.style.left = `${e.clientX - offsetX}px`;
-                selectedImage.style.top = `${e.clientY - offsetY}px`;
+                selectedImage.style.left = `${(e.clientX - offsetX) / scale}px`;
+                selectedImage.style.top = `${(e.clientY - offsetY) / scale}px`;
             };
 
             const stopHandler = () => {
@@ -129,8 +129,8 @@
                         const img = new Image();
                         img.src = event.target.result;
                         img.onload = () => {
-                            img.style.left = `${e.clientX}px`;
-                            img.style.top = `${e.clientY}px`;
+                            img.style.left = `${(e.clientX - window.scrollX) / scale}px`;
+                            img.style.top = `${(e.clientY - window.scrollY) / scale}px`;
                             images.push(img);
                             document.querySelector('.content-wrapper').appendChild(img);
                         };
