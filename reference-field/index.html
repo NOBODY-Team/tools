@@ -59,12 +59,14 @@
         <button id="minusBtn">−</button>
         <button id="plusBtn">+</button>
         <button id="deleteBtn">🗑</button>
+        <button id="exportBtn">📤</button>
     </div>
 
     <script>
         let selectedImage = null;
         let offsetX, offsetY, dragStartX, dragStartY;
         let scale = 1;
+        let images = [];
 
         const zoom = (factor) => {
             scale *= factor;
@@ -119,6 +121,7 @@
                         img.onload = () => {
                             img.style.left = `${e.clientX}px`;
                             img.style.top = `${e.clientY}px`;
+                            images.push(img);
                             document.body.appendChild(img);
                         };
                     };
@@ -148,6 +151,30 @@
                 selectedImage.remove();
                 selectedImage = null;
             }
+        });
+
+        document.getElementById('exportBtn').addEventListener('click', () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            let totalWidth = 0, totalHeight = 0;
+
+            images.forEach(img => {
+                totalWidth = Math.max(totalWidth, img.offsetLeft + img.width);
+                totalHeight = Math.max(totalHeight, img.offsetTop + img.height);
+            });
+
+            canvas.width = totalWidth;
+            canvas.height = totalHeight;
+
+            images.forEach(img => {
+                ctx.drawImage(img, img.offsetLeft, img.offsetTop, img.width, img.height);
+            });
+
+            const dataUrl = canvas.toDataURL('image/png');
+            const a = document.createElement('a');
+            a.href = dataUrl;
+            a.download = 'collage.png';
+            a.click();
         });
     </script>
 </body>
