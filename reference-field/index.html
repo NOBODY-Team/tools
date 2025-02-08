@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NOBODY Reference Field</title>
+    <title>Interactive Black Page with UI</title>
     <style>
         body {
             background-color: black;
@@ -59,7 +59,7 @@
         <button id="minusBtn">−</button>
         <button id="plusBtn">+</button>
         <button id="deleteBtn">🗑</button>
-        <button id="exportBtn">→</button>
+        <button id="exportBtn">↗️</button>
     </div>
 
     <script>
@@ -70,7 +70,7 @@
 
         const zoom = (factor) => {
             scale *= factor;
-            document.body.style.transform = scale(${scale});
+            document.body.style.transform = `scale(${scale})`;
         };
 
         document.body.addEventListener('mousedown', (e) => {
@@ -88,8 +88,8 @@
             dragStartY = e.clientY;
 
             const moveHandler = (e) => {
-                selectedImage.style.left = ${e.clientX - offsetX}px;
-                selectedImage.style.top = ${e.clientY - offsetY}px;
+                selectedImage.style.left = `${e.clientX - offsetX}px`;
+                selectedImage.style.top = `${e.clientY - offsetY}px`;
             };
 
             const stopHandler = () => {
@@ -122,8 +122,8 @@
                         const img = new Image();
                         img.src = event.target.result;
                         img.onload = () => {
-                            img.style.left = ${e.clientX}px;
-                            img.style.top = ${e.clientY}px;
+                            img.style.left = `${e.clientX}px`;
+                            img.style.top = `${e.clientY}px`;
                             images.push(img);
                             document.body.appendChild(img);
                         };
