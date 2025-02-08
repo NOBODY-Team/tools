@@ -10,10 +10,14 @@
             margin: 0;
             overflow: hidden;
             height: 100vh;
-            position: relative;
             display: flex;
             justify-content: center;
             align-items: center;
+            position: relative;
+        }
+        .content-wrapper {
+            position: relative;
+            transition: transform 0.2s;
         }
         img {
             position: absolute;
@@ -55,6 +59,9 @@
     </style>
 </head>
 <body>
+    <div class="content-wrapper">
+        <!--PASTED IMAGES GO HERE-->
+    </div>
     <div class="ui-box">
         <button id="minusBtn">−</button>
         <button id="plusBtn">+</button>
@@ -70,7 +77,7 @@
 
         const zoom = (factor) => {
             scale *= factor;
-            document.body.style.transform = `scale(${scale})`;
+            document.querySelector('.content-wrapper').style.transform = `scale(${scale})`;
         };
 
         document.body.addEventListener('mousedown', (e) => {
@@ -125,7 +132,7 @@
                             img.style.left = `${e.clientX}px`;
                             img.style.top = `${e.clientY}px`;
                             images.push(img);
-                            document.body.appendChild(img);
+                            document.querySelector('.content-wrapper').appendChild(img);
                         };
                     };
                     reader.readAsDataURL(blob);
