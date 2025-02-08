@@ -1,1 +1,88 @@
-test
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Black Page</title>
+    <style>
+        body {
+            background-color: black;
+            margin: 0;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        img {
+            position: absolute;
+            cursor: pointer;
+            user-select: none;
+            max-width: 100%;
+            max-height: 100%;
+            transition: transform 0.2s ease;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        let scale = 1;
+
+        document.body.onwheel = (e) => {
+            if (e.deltaY < 0) {
+                scale *= 1.1;
+            } else {
+                scale /= 1.1;
+            }
+            document.body.style.transform = `scale(${scale})`;
+        }
+
+        document.body.ondblclick = (e) => {
+            if (e.target.tagName.toLowerCase() === 'img') {
+                e.target.remove();
+            }
+        };
+
+        document.body.addEventListener('paste', (e) => {
+            const items = e.clipboardData.items;
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.startsWith('image')) {
+                    const blob = items[i].getAsFile();
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const img = new Image();
+                        img.src = event.target.result;
+                        img.onload = () => {
+                            img.style.left = `${e.clientX}px`;
+                            img.style.top = `${e.clientY}px`;
+                            document.body.appendChild(img);
+                        };
+                    };
+                    reader.readAsDataURL(blob);
+                }
+            }
+        });
+
+        document.body.addEventListener('mousedown', (e) => {
+            const img = e.target;
+            if (img.tagName.toLowerCase() !== 'img') return;
+
+            let offsetX = e.clientX - img.getBoundingClientRect().left;
+            let offsetY = e.clientY - img.getBoundingClientRect().top;
+
+            const moveHandler = (e) => {
+                img.style.left = `${e.clientX - offsetX}px`;
+                img.style.top = `${e.clientY - offsetY}px`;
+            };
+
+            const stopHandler = () => {
+                document.removeEventListener('mousemove', moveHandler);
+                document.removeEventListener('mouseup', stopHandler);
+            };
+
+            document.addEventListener('mousemove', moveHandler);
+            document.addEventListener('mouseup', stopHandler);
+        });
+    </script>
+</body>
+</html>
