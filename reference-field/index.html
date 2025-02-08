@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Black Page with UI</title>
+    <title>NOBODY Reference Field</title>
     <style>
         body {
             background-color: black;
@@ -14,6 +14,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            cursor: grab;
         }
         img {
             position: absolute;
@@ -26,7 +27,7 @@
             border: 3px solid yellow;
         }
         .ui-box {
-            position: absolute;
+            position: fixed;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
@@ -67,6 +68,8 @@
         let offsetX, offsetY, dragStartX, dragStartY;
         let scale = 1;
         let images = [];
+        let isPanning = false;
+        let panStartX, panStartY;
 
         const zoom = (factor) => {
             scale *= factor;
@@ -74,31 +77,54 @@
         };
 
         document.body.addEventListener('mousedown', (e) => {
-            if (e.target.tagName.toLowerCase() !== 'img') return;
+            if (e.button === 1) {
+                isPanning = true;
+                panStartX = e.clientX;
+                panStartY = e.clientY;
+                document.body.style.cursor = 'grabbing';
+                e.preventDefault();
+            } else if (e.target.tagName.toLowerCase() === 'img') {
+                if (selectedImage) {
+                    selectedImage.classList.remove('selected');
+                }
+                selectedImage = e.target;
+                selectedImage.classList.add('selected');
 
-            if (selectedImage) {
-                selectedImage.classList.remove('selected');
+                offsetX = e.clientX - selectedImage.getBoundingClientRect().left;
+                offsetY = e.clientY - selectedImage.getBoundingClientRect().top;
+                dragStartX = e.clientX;
+                dragStartY = e.clientY;
+
+                const moveHandler = (e) => {
+                    selectedImage.style.left = `${e.clientX - offsetX}px`;
+                    selectedImage.style.top = `${e.clientY - offsetY}px`;
+                };
+
+                const stopHandler = () => {
+                    document.removeEventListener('mousemove', moveHandler);
+                    document.removeEventListener('mouseup', stopHandler);
+                };
+
+                document.addEventListener('mousemove', moveHandler);
+                document.addEventListener('mouseup', stopHandler);
             }
-            selectedImage = e.target;
-            selectedImage.classList.add('selected');
+        });
 
-            offsetX = e.clientX - selectedImage.getBoundingClientRect().left;
-            offsetY = e.clientY - selectedImage.getBoundingClientRect().top;
-            dragStartX = e.clientX;
-            dragStartY = e.clientY;
+        document.body.addEventListener('mousemove', (e) => {
+            if (isPanning) {
+                const dx = e.clientX - panStartX;
+                const dy = e.clientY - panStartY;
+                window.scrollBy(-dx, -dy);
+                panStartX = e.clientX;
+                panStartY = e.clientY;
+            }
+        });
 
-            const moveHandler = (e) => {
-                selectedImage.style.left = `${e.clientX - offsetX}px`;
-                selectedImage.style.top = `${e.clientY - offsetY}px`;
-            };
-
-            const stopHandler = () => {
-                document.removeEventListener('mousemove', moveHandler);
-                document.removeEventListener('mouseup', stopHandler);
-            };
-
-            document.addEventListener('mousemove', moveHandler);
-            document.addEventListener('mouseup', stopHandler);
+        document.body.addEventListener('mouseup', () => {
+            if (isPanning) {
+                isPanning = false;
+                document.body.style.cursor = 'grab';
+            }
         });
 
         document.body.addEventListener('click', (e) => {
